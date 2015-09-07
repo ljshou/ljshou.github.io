@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://ljshou.gitcafe.io/2014/10/30/用hexo在gitcafe上搭个人博客/index.html">
 <meta property="og:site_name" content="L.J.SHOU's Technical Blog">
 <meta property="og:description" content="This blog tells you how to set up your own blog rapidly using Hexo on github/gitcafe pages.">
-<meta property="og:updated_time" content="2015-09-07T13:19:57.284Z">
+<meta property="og:updated_time" content="2015-09-07T13:42:48.509Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Set up personal blog using hexo on github/gitcafe">
 <meta name="twitter:description" content="This blog tells you how to set up your own blog rapidly using Hexo on github/gitcafe pages.">
@@ -78,6 +78,8 @@
   </div>
 
       
+
+
     </div>
     <div class="article-entry" itemprop="articleBody">
       
@@ -100,7 +102,7 @@
 </li>
 </ol>
 <p>Hexo official site: <a href="http://hexo.io" target="_blank" rel="external">Hexo</a></p>
-<h3 id="Set_up_blog_locally">Set up blog locally</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hexo init my_blog <span class="comment">#initialize blog</span></span><br><span class="line"><span class="built_in">cd</span> my_blog</span><br><span class="line">npm install <span class="comment">#set up blog</span></span><br><span class="line">npm install hexo-server --save <span class="comment">#support blog preview</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#support deploy using git</span></span><br><span class="line">hexo server <span class="comment">#preview blog locally. localhost:4000</span></span><br></pre></td></tr></table></figure>
+<h3 id="Set_up_blog_locally">Set up blog locally</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">hexo init my_blog <span class="comment">#initialize blog</span></span><br><span class="line"><span class="built_in">cd</span> my_blog</span><br><span class="line">npm install <span class="comment">#set up blog</span></span><br><span class="line">npm install hexo-server --save <span class="comment">#support blog preview</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#support deploy using git</span></span><br><span class="line">npm install hexo-generator-feed --save</span><br><span class="line">npm install hexo-generator-sitemap --save</span><br><span class="line">npm install hexo-renderer-mathjax --save</span><br><span class="line">hexo server <span class="comment">#preview blog locally. localhost:4000</span></span><br></pre></td></tr></table></figure>
 <h3 id="Hexo_commands">Hexo commands</h3><ul>
 <li>Initialize hexo blog: <code>hexo init</code></li>
 <li>Write a new blog: <code>hexo new &quot;blog&#39;s title&quot;</code></li>
@@ -111,7 +113,7 @@
 <h3 id="Hexo_deploy">Hexo deploy</h3><p>gitcafe 和 github 很相似，可用于代码托管，同样具有 git-pages的功能，能够托管静态网页。</p>
 <ul>
 <li><p>注册gitcafe账号。在gitcafe注册并创建<strong>公开项目</strong>，<strong>项目名和用户名要一致</strong>。<br>在blog_config.yml添加如下代码：注意把 your_name 替换成你的项目名</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repository: git@gitcafe.com:your_name/your_name.git</span><br><span class="line">  branch: gitcafe-pages</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repository: git@gitcafe.com:your_name/your_name.git</span><br><span class="line">  branch: gitcafe-pages</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>设置 ssh <a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">参考</a><br>将公钥拷贝到你的gitcafe主页上，帐号设置，SSH公钥管理即可。</p>
 </li>
@@ -152,7 +154,9 @@
   
 </article>
 
-</section>
+
+
+  </section>
     <footer id="footer">
   
   <div class="outer">
