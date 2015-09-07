@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://ljshou.gitcafe.io/2014/11/05/浅谈C-的this指针/index.html">
 <meta property="og:site_name" content="L.J.SHOU's Technical Blog">
 <meta property="og:description" content="一个关于C++很坑的问题，能够对this指针能够有更好的认识">
-<meta property="og:updated_time" content="2015-09-03T07:42:47.469Z">
+<meta property="og:updated_time" content="2015-09-07T15:06:53.210Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="浅谈C++的this指针">
 <meta name="twitter:description" content="一个关于C++很坑的问题，能够对this指针能够有更好的认识">
@@ -84,10 +84,10 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>一个关于C++很坑的问题，能够对this指针能够有更好的认识<br><a id="more"></a></p>
-<p>##代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class A &#123;&#10;public:&#10;    A(int x=0): a(x) &#123;&#125;&#10;    void print() &#123;&#10;        cout &#60;&#60; &#34;print ok&#34; &#60;&#60; endl;&#10;    &#125;&#10;    void print_int() &#123;&#10;        cout &#60;&#60; &#34;int = &#34; &#60;&#60; a &#60;&#60; endl;&#10;    &#125;&#10;private:&#10;    int a;&#10;&#125;;&#10;int main(void)&#10;&#123;&#10;    A *p = NULL; //&#31354;&#25351;&#38024;&#12288;&#10;    p-&#62;print();  //&#35821;&#21477;A&#10;    p-&#62;print_int(); //&#35821;&#21477;B&#10;&#10;    return 0;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
-<p>###错误的结论<br>上述代码是否有问题？<br>第一眼一看，程序试图通过一个NULL指针，访问成员函数，显然会出现 segmentation fault.</p>
-<p>###结果<br>语句A正确运行，而语句B 出现 segmentation fault.<br>语句B段错误可以理解，因为试图访问地址0，没有权限，所以段错误。但是为什么第一个print调用成功呢？<br>难道 －&gt; 不是被编译器理解成(*p)吗？那么试图访问0地址，必然会段错误。</p>
-<p>###原因<br>C++对象模型为了提高空间和时间效率，<strong>static数据成员被放置到对象内部，static数据成员， static and nonstatic 函数成员均被放到对象之外</strong>。  </p>
+<h2 id="代码">代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class A &#123;&#10;public:&#10;    A(int x=0): a(x) &#123;&#125;&#10;    void print() &#123;&#10;        cout &#60;&#60; &#34;print ok&#34; &#60;&#60; endl;&#10;    &#125;&#10;    void print_int() &#123;&#10;        cout &#60;&#60; &#34;int = &#34; &#60;&#60; a &#60;&#60; endl;&#10;    &#125;&#10;private:&#10;    int a;&#10;&#125;;&#10;int main(void)&#10;&#123;&#10;    A *p = NULL; //&#31354;&#25351;&#38024;&#12288;&#10;    p-&#62;print();  //&#35821;&#21477;A&#10;    p-&#62;print_int(); //&#35821;&#21477;B&#10;&#10;    return 0;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="错误的结论">错误的结论</h3><p>上述代码是否有问题？<br>第一眼一看，程序试图通过一个NULL指针，访问成员函数，显然会出现 segmentation fault.</p>
+<h3 id="结果">结果</h3><p>语句A正确运行，而语句B 出现 segmentation fault.<br>语句B段错误可以理解，因为试图访问地址0，没有权限，所以段错误。但是为什么第一个print调用成功呢？<br>难道 －&gt; 不是被编译器理解成(*p)吗？那么试图访问0地址，必然会段错误。</p>
+<h3 id="原因">原因</h3><p>C++对象模型为了提高空间和时间效率，<strong>static数据成员被放置到对象内部，static数据成员， static and nonstatic 函数成员均被放到对象之外</strong>。  </p>
 <p>成员函数是独立于对象，可能会让大家很疑惑。static成员函数可以理解，但是non-static函数呢，如何去访问non-static成员变量呢？其实这是通过指向对象的this指针来实现的。成员函数是否具有指向对象的this指针，这就是non-static, 和static成员函数的区别所在。  </p>
 <p>现在也就可以理解上面的这段代码了。print() 和 print_int()都是non-static函数，所以它们具有 this 指针，指向绑定的对象。但是，<br>第一个语句  <code>A *p = NULL;</code> 将this指针赋值为NULL。  </p>
 <ul>
