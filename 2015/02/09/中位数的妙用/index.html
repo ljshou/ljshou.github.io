@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://ljshou.gitcafe.io/2015/02/09/中位数的妙用/index.html">
 <meta property="og:site_name" content="L.J.SHOU's Technical Blog">
 <meta property="og:description" content="中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)">
-<meta property="og:updated_time" content="2015-09-06T15:59:41.082Z">
+<meta property="og:updated_time" content="2015-09-06T16:25:34.038Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="中位数的妙用">
 <meta name="twitter:description" content="中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)">
@@ -84,8 +84,7 @@
         <p>中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)<br><a id="more"></a></p>
 <h3 id="中位数算法">中位数算法</h3><p>求N个数中的中位数即求第n/2大的数. 算法导论中给出了两种求第k大的数的算法<br><em>算法1</em>： 随机算法 平均复杂度O(n)<br>思路：利用quicksort的随机版本的partition, 将数组分成2部分：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if &#24038;&#36793;&#37096;&#20998;&#25968;&#30446;&#60;k, &#21017;&#22312;&#21491;&#36793;&#36882;&#24402;&#25628;&#32034;&#10;else if &#24038;&#36793;&#30340;&#25968;&#62; k&#65292; &#21017;&#22312;&#24038;&#36793;&#36882;&#24402;&#25628;&#32034;&#10;else  return a[partition];</span><br></pre></td></tr></table></figure></p>
 <p><em>算法2</em>： 确定性算法 最坏复杂度O(n)<br>但其实实际使用并不多，因为常数因子项很大。</p>
-<p>###三个例子</p>
-<p>####例题1：带权中位数<br><em>DESCRIPTION:</em><br>n个数x[1], x[2],…, x[n], 各自带有一个权重， w[1], w[2], …, w[n], w的总和是1，<br>求x[k]满足所有满足x[i] &lt; x[k]的元素的权重之和 &lt; 1/2，所有满足x[i] &gt; x[k] 的元素的权重之和 &gt;= 1/2;</p>
+<h3 id="三个例子">三个例子</h3><p>####例题1：带权中位数<br><em>DESCRIPTION:</em><br>n个数x[1], x[2],…, x[n], 各自带有一个权重， w[1], w[2], …, w[n], w的总和是1，<br>求x[k]满足所有满足x[i] &lt; x[k]的元素的权重之和 &lt; 1/2，所有满足x[i] &gt; x[k] 的元素的权重之和 &gt;= 1/2;</p>
 <p><em>ALGO.:</em><br><em>算法1</em>：先排序O(NlgN)， 从前往后遍历数组，找到第一个 x[k], 使得前k个元素的权重之和 &gt;= 1/2, return x[k]</p>
 <p><em>算法2</em>：<br>分治: 用中位数算法，将问题的规模减半<br>思路： 其实这个题并不需要排序，我们仅仅需要找到 n个数中较小的K(未知)个数的集合，使得它的和 &lt; 1/2, 其他元素的和 &gt;= 1/2, 具体这两个集合中的数并不需要排序。考虑用中位数算法来找这个集合。</p>
 <ul>
@@ -95,7 +94,7 @@
 <li><p>复杂度： T(n) = T(n/2) + O(n)</p>
 </li>
 </ul>
-<p>####例题2： 部分背包问题<br><em>DESCRIPTION:</em><br>一个窃贼去一家商店偷窃，有n件商品： 第i件物品值vi元，重wi榜（vi, wi都是整数），他的背包最多只能装下W榜物品，<br>每件商品他可以选择一部分带走，而不像0-1背包问题。问他最多能带走多贵的物品？</p>
+<h4 id="例题2：_部分背包问题">例题2： 部分背包问题</h4><p><em>DESCRIPTION:</em><br>一个窃贼去一家商店偷窃，有n件商品： 第i件物品值vi元，重wi榜（vi, wi都是整数），他的背包最多只能装下W榜物品，<br>每件商品他可以选择一部分带走，而不像0-1背包问题。问他最多能带走多贵的物品？</p>
 <p><em>ALGO.:</em><br><em>算法1</em>： 由于部分背包问题允许仅拿走物品的一部分，物件更像是金粉，可证明其具有贪心的性质。<br>按照每榜的价值进行排序，然后由价值的大小依次往包里装，直到重量为W。<br>算法复杂度是 O(nlgn).</p>
 <p>能不能将其复杂度降低到线性呢？<br>注意到，无论是动态规划还是贪心，其实都具有问题可分（decomposed)的性质, 也就是可以考虑用分治（divide-and-conquer)。<br>要构造O(n)的算法，首先想到 T(n) = T(n/2) + O(n)，<br>————— 在O(n)的时间内把问题的规模降为一半，那么就得到了一个O(N)的算法。</p>
 <p>贪心算法时间复杂度主要是排序，可以不排序吗？<br>  可以。排序只是为了找出那些单价高的物品集合，所以我们并不需要把所有的单价进行排序。<br>我们只需要找到背包所能装得下的那部分单价较高的物品即可。这类似于在数组中找前k大的k个数（复杂度是O(N)）.<br>因此使用排序我们其实做了多余的比较。<br>目标：一分为二，而且要找的是前k大的k个数（k未知），<br>Bingo！ 先找出中位数!</p>
@@ -108,7 +107,7 @@
 <ul>
 <li>复杂度分析：<br>求中位数复杂度是 O（N）, 上述三种情况中除了子问题外，也顶多花O（N）时间，<br>T(n) &lt;= T(n/2) + O(n)<br>所以 T(n) = O（n)</li>
 </ul>
-<p>####例题3：Majority number<br><em>DESCRIPTION:</em><br>N个数中有一个数出现的次数大于1/2</p>
+<h4 id="例题3：Majority_number">例题3：Majority number</h4><p><em>DESCRIPTION:</em><br>N个数中有一个数出现的次数大于1/2</p>
 <p><em>ALGO.:</em><br><em>算法1</em>： 先排序，再扫描一次数组，记录出现的次数 O(nlgn)<br><em>算法2</em>: 这一问题其实也不需要排序。中位数即为所求。O(n)<br><em>算法3</em>：俄罗斯方块的思想</p>
 
       
