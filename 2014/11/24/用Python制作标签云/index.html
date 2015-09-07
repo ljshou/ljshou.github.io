@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>用Python制作标签云 - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="《Learn Python—1. TagCloud using Python》最近在学Python, 确实是一门很好学习的语言。准备做几个有意思的小项目。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用Python制作标签云">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2014/11/24/用Python制作标签云/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="《Learn Python—1. TagCloud using Python》最近在学Python, 确实是一门很好学习的语言。准备做几个有意思的小项目。">
+<meta property="og:image" content="http://ljshou.qiniudn.com/tagcloud.png">
+<meta property="og:updated_time" content="2015-09-03T07:42:47.469Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用Python制作标签云">
+<meta name="twitter:description" content="《Learn Python—1. TagCloud using Python》最近在学Python, 确实是一门很好学习的语言。准备做几个有意思的小项目。">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-用Python制作标签云" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      用Python制作标签云
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/11/24/用Python制作标签云/" class="article-date">
+  <time datetime="2014-11-24T06:48:05.000Z" itemprop="datePublished">Nov 24 2014</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/python/">python</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>《Learn Python—1. TagCloud using Python》<br>最近在学Python, 确实是一门很好学习的语言。准备做几个有意思的小项目。<br><a id="more"></a></p>
+<p>###效果图<br><img src="http://ljshou.qiniudn.com/tagcloud.png" alt=""></p>
+<p>###TagCloud 类代码<br>用法如下：</p>
+<ul>
+<li>输入： 一个list, 包含多个(word, frequency)的元组</li>
+<li>输出： outputHTML(name)函数用于输出HTML文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># example usage&#10;if __name__ == &#39;__main__&#39;:&#10;    pairs = [(&#39;hi&#39;,5),(&#39;there&#39;,6),(&#39;mom&#39;,10),(&#39;fred&#39;,2),(&#39;bill&#39;,20)]&#10;    tg = TagCloud(pairs)&#10;    tg.outputHTML(&#39;testFile&#39;) #testFile.html is generated</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class TagCloud:&#10;    def __init__(self, pairs):&#10;        &#39;&#39;&#39;pairs is a list consisting of pairs of (word, frequency), like&#10;        -------[(&#39;hi&#39;,5),(&#39;there&#39;,6),(&#39;mom&#39;,10)]&#39;&#39;&#39;&#10;        self.pairs = pairs&#10;&#10;    def outputHTML(self, name):&#10;&#9;#&#21462;&#20986;&#35789;&#39057;&#26368;&#22823;&#30340;40&#20010;&#35789;&#10;        pairs = sorted(self.pairs, key = lambda d: d[1], reverse = True)&#10;        if len(pairs) &#62; 40: pairs = pairs[:40]&#10;&#10;        high_count = pairs[0][1]&#10;        low_count = pairs[-1][1]&#10;&#10;&#9;#&#37325;&#26032;&#25171;&#20081;&#35789;&#39057;&#65288;&#26681;&#25454;word&#30340;&#23383;&#20856;&#24207;&#65289;&#10;        pairs = sorted(pairs)&#10;&#10;&#9;#&#36755;&#20986;HTML&#25991;&#20214;&#10;        body = &#39;&#39;&#10;        for word, cnt in pairs:&#10;            body = body + self._makeHTMLword(word, cnt, high_count, low_count)&#10;        box = self._makeHTMLbox(body)&#10;        self._printHTMLfile(box, name)&#10;&#10;    def _printHTMLfile(self, body, title):&#10;        &#39;&#39;&#39; create a standard html page with titles, header etc.&#10;        and add the body (an html box) to that page. File created is title+&#39;.html&#39;&#10;        &#39;&#39;&#39;&#10;        fd = open(title+&#39;.html&#39;,&#39;w&#39;)&#10;        theStr=&#34;&#34;&#34;&#10;        &#60;!DOCTYPE HTML PUBLIC &#34;-//IETF//DTD HTML//EN&#34;&#62;&#10;        &#60;html&#62; &#60;head&#62;&#10;        &#60;title&#62;&#34;&#34;&#34;+title+&#34;&#34;&#34;&#60;/title&#62;&#10;        &#60;/head&#62;&#10;&#10;        &#60;body&#62;&#10;        &#60;h1&#62;&#34;&#34;&#34;+title+&#39;&#60;/h1&#62;&#39;+&#39;\n&#39;+body+&#39;\n&#39;+&#34;&#34;&#34;&#60;hr&#62;&#10;        &#60;address&#62;&#60;/address&#62;&#10;        &#60;!-- hhmts start --&#62; Last modified: Fri Oct 10 10:09:41 EDT 2008 &#60;!-- hhmts end --&#62;&#10;        &#60;/body&#62; &#60;/html&#62;&#10;        &#34;&#34;&#34;&#10;        fd.write(theStr)&#10;        fd.close()&#10;&#10;    def _makeHTMLbox(self, body):&#10;        &#39;&#39;&#39; make and HTML box that has all the words in it&#10;        &#39;&#39;&#39;&#10;        boxStr = &#34;&#34;&#34;&#60;div style=\&#34;&#10;        width: 800px;&#10;        background-color: rgb(250,250,250);&#10;        border: 1px grey solid;&#10;        text-align: center\&#34;&#62;%s&#60;/div&#62;&#10;        &#34;&#34;&#34;&#10;        return boxStr % (body)&#10;&#10;    def _makeHTMLword(self, word,cnt,high,low):&#10;        &#39;&#39;&#39; make a word with a font size to be placed in the box. Font size is scaled&#10;        between htmlBig and htmlLittle (to be user set). high and low represent the high&#10;        and low counts in the document. cnt is the cnt of the word&#10;        &#39;&#39;&#39;&#10;        htmlBig = 96&#10;        htmlLittle = 14&#10;        ratio = (cnt-low)/float(high-low)&#10;        fontsize = htmlBig*ratio + (1-ratio)*htmlLittle&#10;        fontsize = int(fontsize)&#10;        wordStr = &#39;&#60;span style=\&#34;font-size:%spx;\&#34;&#62;%s&#60;/span&#62; &#39;&#10;        return wordStr % (str(fontsize), word)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/12/07/Python之decorator装饰器/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          Python 之 decorator 装饰器
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/11/05/浅谈C-的this指针/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">浅谈C++的this指针&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>

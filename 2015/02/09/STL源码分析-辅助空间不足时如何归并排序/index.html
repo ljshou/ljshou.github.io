@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>STL源码分析---辅助空间不足时如何归并排序 - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="分析STL库中的implace_merge函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="STL源码分析---辅助空间不足时如何归并排序">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2015/02/09/STL源码分析-辅助空间不足时如何归并排序/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="分析STL库中的implace_merge函数">
+<meta property="og:image" content="http://ljshou.qiniudn.com/merge1.png">
+<meta property="og:image" content="http://ljshou.qiniudn.com/merge2.png">
+<meta property="og:image" content="http://ljshou.qiniudn.com/merge3.png">
+<meta property="og:image" content="http://ljshou.qiniudn.com/merge4.png">
+<meta property="og:image" content="http://ljshou.qiniudn.com/merge5.png">
+<meta property="og:updated_time" content="2015-09-03T07:42:47.453Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="STL源码分析---辅助空间不足时如何归并排序">
+<meta name="twitter:description" content="分析STL库中的implace_merge函数">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-STL源码分析-辅助空间不足时如何归并排序" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      STL源码分析---辅助空间不足时如何归并排序
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/02/09/STL源码分析-辅助空间不足时如何归并排序/" class="article-date">
+  <time datetime="2015-02-09T13:10:47.000Z" itemprop="datePublished">Feb 9 2015</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/STL源码分析/">STL源码分析</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>分析STL库中的implace_merge函数<br><a id="more"></a></p>
+<p>两个连在一起的序列 [first, middle) 和 [middle, last) 都已经排序，<br>归并排序最核心的算法就是 将 [first, middle) 和 [middle, last) 在 O(N)时间内合并成一个有序数组。</p>
+<p>但是合并的过程中一般需要  m + n 的额外辅助空间。其中， m 、 n 是数组的左右半边的长度。<br>现在假如，</p>
+<ul>
+<li>辅助空间 bufSize &lt; m + n 呢， 但是比 min(m, n) 大。也就是说能够容纳序列1 或者 序列 2。</li>
+<li>bufSize &lt; min(m, n) 呢？？</li>
+<li>假如没有辅助内存呢？？</li>
+</ul>
+<p>STL implace_merge 函数在其实现中分别考虑了上述三种情况，并且尽可能地使效率比较高。<br>记号：长度为 m 的有序数组 A， 长度为 n 的有序数组 B，</p>
+<p>####Case 1: buffer 能够容纳其中的一个有序数组</p>
+<ol>
+<li>能够容纳 序列 1 [first, middle)<br><img src="http://ljshou.qiniudn.com/merge1.png" alt=""><br>这时候只要先把 [first, middle) 拷贝到 [buffer, end_buffer) 中，<br>然后进行常规的 Merge, 依次将 [middle, last) 和 [buffer, end_buffer) 中小的元素放到 [first, last) 即可。不会存在数据覆盖的问题。<br>STL 源码如下：<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> _BidirectionalIter, <span class="keyword">class</span> _Distance, <span class="keyword">class</span> _Pointer&gt;  </span><br><span class="line"><span class="keyword">void</span> __merge_adaptive(_BidirectionalIter __first,  </span><br><span class="line">                      _BidirectionalIter __middle,</span><br><span class="line">                      _BidirectionalIter __last,  </span><br><span class="line">                      _Distance __len1, _Distance __len2,  </span><br><span class="line">                      _Pointer __buffer, _Distance __buffer_size) &#123;  </span><br><span class="line">  <span class="keyword">if</span> (__len1 &lt;= __len2 &amp;&amp; __len1 &lt;= __buffer_size) &#123;  </span><br><span class="line">    _Pointer __buffer_end = copy(__first, __middle, __buffer);  </span><br><span class="line">    merge(__buffer, __buffer_end, __middle, __last, __first);  </span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>copy(first, _middle, _buffer) 就是将 [first, middle) 复制到 buffer 中，<br>然后调用 STL 库的merge。</p>
+<ol>
+<li>能够容纳 序列 2 [middle，last)<br><img src="http://ljshou.qiniudn.com/merge2.png" alt=""><br>这时候将 [middle, last) 复制到 [buffer, end_buffer) 中，然后 逆向 merge 即可。<br>从两个序列的尾部向前，依次将大的元素放到数组的尾部。。<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (__len2 &lt;= __buffer_size) &#123;  </span><br><span class="line">  _Pointer __buffer_end = copy(__middle, __last, __buffer);  </span><br><span class="line">  __merge_backward(__first, __middle, __buffer, __buffer_end, __last);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> _BidirectionalIter1, <span class="keyword">class</span> _BidirectionalIter2,  </span><br><span class="line">          <span class="keyword">class</span> _BidirectionalIter3, <span class="keyword">class</span> _Compare&gt;  </span><br><span class="line">_BidirectionalIter3 __merge_backward(_BidirectionalIter1 __first1,  </span><br><span class="line">                                     _BidirectionalIter1 __last1,  </span><br><span class="line">                                     _BidirectionalIter2 __first2,  </span><br><span class="line">                                     _BidirectionalIter2 __last2,  </span><br><span class="line">                                     _BidirectionalIter3 __result,  </span><br><span class="line">                                     _Compare __comp) &#123;  </span><br><span class="line">  <span class="keyword">if</span> (__first1 == __last1)  </span><br><span class="line">    <span class="keyword">return</span> copy_backward(__first2, __last2, __result);  </span><br><span class="line">  <span class="keyword">if</span> (__first2 == __last2)  </span><br><span class="line">    <span class="keyword">return</span> copy_backward(__first1, __last1, __result);  </span><br><span class="line">  --__last1;  </span><br><span class="line">  --__last2;  </span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;  </span><br><span class="line">    <span class="keyword">if</span> (__comp(*__last2, *__last1)) &#123;  </span><br><span class="line">      *--__result = *__last1;  </span><br><span class="line">      <span class="keyword">if</span> (__first1 == __last1)  </span><br><span class="line">        <span class="keyword">return</span> copy_backward(__first2, ++__last2, __result);  </span><br><span class="line">      --__last1;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">else</span> &#123;  </span><br><span class="line">      *--__result = *__last2;  </span><br><span class="line">      <span class="keyword">if</span> (__first2 == __last2)  </span><br><span class="line">        <span class="keyword">return</span> copy_backward(__first1, ++__last1, __result);  </span><br><span class="line">      --__last2;  </span><br><span class="line">    &#125;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>###Case 2: buffer 大小不足以容纳 [first, middle) 和 [middle，last)</p>
+<p>上面的两种思路其实挺巧的，但是现在buffer 更小，怎么办？？  </p>
+<p>采取分治的思想，将问题的规模降下来，递归调用子问题，直到对于子问题，这个Buffer 大小足以容纳某一个有序序列。</p>
+<p>我们的思路是：将数组分成  【1】  【2】  【3】  【4】 四个小数组。<br>                         交换 [2]  [3]，使得 【1 3】 作为新的子问题， 递归调用；<br>                                                       【2 4】作为新的子问题， 递归调用；<br>注意： 要使得最终数组有序，必须满足 【1 3】 中所有元素 &lt;= 【2 4】中所有元素（这就是我们切数组时要满足的要求）<br>具体来说，<br>假如 [first, middle) 长度小于 [middle, last)。</p>
+<p>STEP 1：<br>    我们拿长的序列开刀，对半开。</p>
+<p><img src="http://ljshou.qiniudn.com/merge3.png" alt=""></p>
+<p>STEP 2:<br>   在对 [middle, first) 切时，要满足 数组 【3】 中元素 &lt;= 数组【2】中的元素，<br>                                                                【2】中元素 &lt;= 数组【4】中的元素<br>    Bingo, 其实只要在 [middle, last) 中 二分搜索【1】中最后一个元素 5。  <img src="http://ljshou.qiniudn.com/merge4.png" alt=""><br>STEP 3:<br>   将数组 【2】和数组【3】rotate 即可。</p>
+<p>   <img src="http://ljshou.qiniudn.com/merge5.png" alt=""></p>
+<p>STEP 4：<br>  递归调用 【1】【3】， 和 【2】【4】；<br>直到 bufferSize &gt;= 序列1或者序列2.</p>
+<p>完整代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">class</span> _BidirectionalIter, <span class="keyword">class</span> _Distance, <span class="keyword">class</span> _Pointer&gt;  </span><br><span class="line"><span class="keyword">void</span> __merge_adaptive(_BidirectionalIter __first,  </span><br><span class="line">                      _BidirectionalIter __middle,</span><br><span class="line">                      _BidirectionalIter __last,  </span><br><span class="line">                      _Distance __len1, _Distance __len2,  </span><br><span class="line">                      _Pointer __buffer, _Distance __buffer_size) &#123;  </span><br><span class="line">  <span class="keyword">if</span> (__len1 &lt;= __len2 &amp;&amp; __len1 &lt;= __buffer_size) &#123;  </span><br><span class="line">    _Pointer __buffer_end = copy(__first, __middle, __buffer);  </span><br><span class="line">    merge(__buffer, __buffer_end, __middle, __last, __first);  </span><br><span class="line">  &#125;  </span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (__len2 &lt;= __buffer_size) &#123;  </span><br><span class="line">    _Pointer __buffer_end = copy(__middle, __last, __buffer);  </span><br><span class="line">    __merge_backward(__first, __middle, __buffer, __buffer_end, __last);  </span><br><span class="line">  &#125;  </span><br><span class="line">  <span class="keyword">else</span> &#123;  </span><br><span class="line">    _BidirectionalIter __first_cut = __first;  </span><br><span class="line">    _BidirectionalIter __second_cut = __middle;  </span><br><span class="line">    _Distance __len11 = <span class="number">0</span>;  </span><br><span class="line">    _Distance __len22 = <span class="number">0</span>;  </span><br><span class="line">    <span class="keyword">if</span> (__len1 &gt; __len2) &#123;  </span><br><span class="line">      __len11 = __len1 / <span class="number">2</span>;  </span><br><span class="line">      advance(__first_cut, __len11);  </span><br><span class="line">      __second_cut = lower_bound(__middle, __last, *__first_cut);  </span><br><span class="line">      distance(__middle, __second_cut, __len22);</span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">else</span> &#123;  </span><br><span class="line">      __len22 = __len2 / <span class="number">2</span>;  </span><br><span class="line">      advance(__second_cut, __len22);  </span><br><span class="line">      __first_cut = upper_bound(__first, __middle, *__second_cut);  </span><br><span class="line">      distance(__first, __first_cut, __len11);  </span><br><span class="line">    &#125;  </span><br><span class="line">    _BidirectionalIter __new_middle =  </span><br><span class="line">      __rotate_adaptive(__first_cut, __middle, __second_cut, __len1 - __len11,  </span><br><span class="line">                        __len22, __buffer, __buffer_size);  </span><br><span class="line">    __merge_adaptive(__first, __first_cut, __new_middle, __len11,  </span><br><span class="line">                     __len22, __buffer, __buffer_size);  </span><br><span class="line">    __merge_adaptive(__new_middle, __second_cut, __last, __len1 - __len11,  </span><br><span class="line">                     __len2 - __len22, __buffer, __buffer_size);  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>####参考资料：<br>侯捷， 《STL 源码分析》</p>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/10/fake-coins/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          fake coins
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/02/09/中位数的妙用/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">中位数的妙用&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>

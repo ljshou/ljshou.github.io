@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>中位数的妙用 - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="中位数的妙用">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2015/02/09/中位数的妙用/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)">
+<meta property="og:updated_time" content="2015-09-06T15:59:41.082Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="中位数的妙用">
+<meta name="twitter:description" content="中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-中位数的妙用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      中位数的妙用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/02/09/中位数的妙用/" class="article-date">
+  <time datetime="2015-02-09T12:08:14.000Z" itemprop="datePublished">Feb 9 2015</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/算法/">算法</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>中位数算法O(N)有许多妙用，能够在一些场合下替代 排序O(NlgN)<br><a id="more"></a></p>
+<h3 id="中位数算法">中位数算法</h3><p>求N个数中的中位数即求第n/2大的数. 算法导论中给出了两种求第k大的数的算法<br><em>算法1</em>： 随机算法 平均复杂度O(n)<br>思路：利用quicksort的随机版本的partition, 将数组分成2部分：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if &#24038;&#36793;&#37096;&#20998;&#25968;&#30446;&#60;k, &#21017;&#22312;&#21491;&#36793;&#36882;&#24402;&#25628;&#32034;&#10;else if &#24038;&#36793;&#30340;&#25968;&#62; k&#65292; &#21017;&#22312;&#24038;&#36793;&#36882;&#24402;&#25628;&#32034;&#10;else  return a[partition];</span><br></pre></td></tr></table></figure></p>
+<p><em>算法2</em>： 确定性算法 最坏复杂度O(n)<br>但其实实际使用并不多，因为常数因子项很大。</p>
+<p>###三个例子</p>
+<p>####例题1：带权中位数<br><em>DESCRIPTION:</em><br>n个数x[1], x[2],…, x[n], 各自带有一个权重， w[1], w[2], …, w[n], w的总和是1，<br>求x[k]满足所有满足x[i] &lt; x[k]的元素的权重之和 &lt; 1/2，所有满足x[i] &gt; x[k] 的元素的权重之和 &gt;= 1/2;</p>
+<p><em>ALGO.:</em><br><em>算法1</em>：先排序O(NlgN)， 从前往后遍历数组，找到第一个 x[k], 使得前k个元素的权重之和 &gt;= 1/2, return x[k]</p>
+<p><em>算法2</em>：<br>分治: 用中位数算法，将问题的规模减半<br>思路： 其实这个题并不需要排序，我们仅仅需要找到 n个数中较小的K(未知)个数的集合，使得它的和 &lt; 1/2, 其他元素的和 &gt;= 1/2, 具体这两个集合中的数并不需要排序。考虑用中位数算法来找这个集合。</p>
+<ul>
+<li><p>伪代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WeightedMid(a, i, j,  w)&#10;    mid = Select(a, i, j) //&#20013;&#20301;&#25968;&#31639;&#27861;&#10;    left_sum = w[i]+w[i+1]+...+w[mid-1]; //&#24038;&#21322;&#37096;&#20998;&#25968;&#32452;&#30340;&#26435;&#37325;&#21644;&#10;    right_sum = w[mid+1]+w[mid+1]+...w[j];&#10;    if left_sum &#62;=w,  return WeightedMid(a, i, mid-1, w);&#10;    elseif right_sum &#62;w, return WeightedMid(a, mid, j, w-left_sum);&#10;    else  return x[mid];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>复杂度： T(n) = T(n/2) + O(n)</p>
+</li>
+</ul>
+<p>####例题2： 部分背包问题<br><em>DESCRIPTION:</em><br>一个窃贼去一家商店偷窃，有n件商品： 第i件物品值vi元，重wi榜（vi, wi都是整数），他的背包最多只能装下W榜物品，<br>每件商品他可以选择一部分带走，而不像0-1背包问题。问他最多能带走多贵的物品？</p>
+<p><em>ALGO.:</em><br><em>算法1</em>： 由于部分背包问题允许仅拿走物品的一部分，物件更像是金粉，可证明其具有贪心的性质。<br>按照每榜的价值进行排序，然后由价值的大小依次往包里装，直到重量为W。<br>算法复杂度是 O(nlgn).</p>
+<p>能不能将其复杂度降低到线性呢？<br>注意到，无论是动态规划还是贪心，其实都具有问题可分（decomposed)的性质, 也就是可以考虑用分治（divide-and-conquer)。<br>要构造O(n)的算法，首先想到 T(n) = T(n/2) + O(n)，<br>————— 在O(n)的时间内把问题的规模降为一半，那么就得到了一个O(N)的算法。</p>
+<p>贪心算法时间复杂度主要是排序，可以不排序吗？<br>  可以。排序只是为了找出那些单价高的物品集合，所以我们并不需要把所有的单价进行排序。<br>我们只需要找到背包所能装得下的那部分单价较高的物品即可。这类似于在数组中找前k大的k个数（复杂度是O(N)）.<br>因此使用排序我们其实做了多余的比较。<br>目标：一分为二，而且要找的是前k大的k个数（k未知），<br>Bingo！ 先找出中位数!</p>
+<p><em>算法2</em>：<br>n个物品的单价数组： A[1:n]<br>找出其中位数，将数组分成3个部分： A{单价高于中位数}   B{单价等于中位数}  C{单价小于中位数}<br>注意到 {A}, {A+B}， {C}的规模&lt;=n/2<br>下面分三种情况：</p>
+<ol>
+<li>若集合A中的物品总质量 &gt;= W， 递归在A中解部分背包问题</li>
+<li>若集合A中的物品总质量 &lt; W, 且集合{A+B}中的物品总质量 &gt;=W,  将A中物品全部装入包中，剩余的从B中随便取即可</li>
+<li>若集合{A+B}中的物品总质量 &lt; W, 将A和B中的物品全部放入背包中，剩余的质量递归地在集合C中求解</li>
+</ol>
+<ul>
+<li>复杂度分析：<br>求中位数复杂度是 O（N）, 上述三种情况中除了子问题外，也顶多花O（N）时间，<br>T(n) &lt;= T(n/2) + O(n)<br>所以 T(n) = O（n)</li>
+</ul>
+<p>####例题3：Majority number<br><em>DESCRIPTION:</em><br>N个数中有一个数出现的次数大于1/2</p>
+<p><em>ALGO.:</em><br><em>算法1</em>： 先排序，再扫描一次数组，记录出现的次数 O(nlgn)<br><em>算法2</em>: 这一问题其实也不需要排序。中位数即为所求。O(n)<br><em>算法3</em>：俄罗斯方块的思想</p>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/中位数/">中位数</a></li></ul>
+
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/02/09/STL源码分析-辅助空间不足时如何归并排序/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          STL源码分析---辅助空间不足时如何归并排序
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/12/28/bonus-dumpling/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">bonus dumpling&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>

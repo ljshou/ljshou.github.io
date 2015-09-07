@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>浅谈C++的this指针 - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一个关于C++很坑的问题，能够对this指针能够有更好的认识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈C++的this指针">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2014/11/05/浅谈C-的this指针/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="一个关于C++很坑的问题，能够对this指针能够有更好的认识">
+<meta property="og:updated_time" content="2015-09-03T07:42:47.469Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈C++的this指针">
+<meta name="twitter:description" content="一个关于C++很坑的问题，能够对this指针能够有更好的认识">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-浅谈C-的this指针" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      浅谈C++的this指针
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2014/11/05/浅谈C-的this指针/" class="article-date">
+  <time datetime="2014-11-05T06:31:52.000Z" itemprop="datePublished">Nov 5 2014</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/cplusplus/">cplusplus</a>
+  </div>
+
+      
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一个关于C++很坑的问题，能够对this指针能够有更好的认识<br><a id="more"></a></p>
+<p>##代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class A &#123;&#10;public:&#10;    A(int x=0): a(x) &#123;&#125;&#10;    void print() &#123;&#10;        cout &#60;&#60; &#34;print ok&#34; &#60;&#60; endl;&#10;    &#125;&#10;    void print_int() &#123;&#10;        cout &#60;&#60; &#34;int = &#34; &#60;&#60; a &#60;&#60; endl;&#10;    &#125;&#10;private:&#10;    int a;&#10;&#125;;&#10;int main(void)&#10;&#123;&#10;    A *p = NULL; //&#31354;&#25351;&#38024;&#12288;&#10;    p-&#62;print();  //&#35821;&#21477;A&#10;    p-&#62;print_int(); //&#35821;&#21477;B&#10;&#10;    return 0;&#10;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>###错误的结论<br>上述代码是否有问题？<br>第一眼一看，程序试图通过一个NULL指针，访问成员函数，显然会出现 segmentation fault.</p>
+<p>###结果<br>语句A正确运行，而语句B 出现 segmentation fault.<br>语句B段错误可以理解，因为试图访问地址0，没有权限，所以段错误。但是为什么第一个print调用成功呢？<br>难道 －&gt; 不是被编译器理解成(*p)吗？那么试图访问0地址，必然会段错误。</p>
+<p>###原因<br>C++对象模型为了提高空间和时间效率，<strong>static数据成员被放置到对象内部，static数据成员， static and nonstatic 函数成员均被放到对象之外</strong>。  </p>
+<p>成员函数是独立于对象，可能会让大家很疑惑。static成员函数可以理解，但是non-static函数呢，如何去访问non-static成员变量呢？其实这是通过指向对象的this指针来实现的。成员函数是否具有指向对象的this指针，这就是non-static, 和static成员函数的区别所在。  </p>
+<p>现在也就可以理解上面的这段代码了。print() 和 print_int()都是non-static函数，所以它们具有 this 指针，指向绑定的对象。但是，<br>第一个语句  <code>A *p = NULL;</code> 将this指针赋值为NULL。  </p>
+<ul>
+<li>print()函数内部并没有试图访问成员变量，所以不需要对访问this指针。而函数的地址是独立于对象的，所以可以指针更具指针的类型，找到函数的定义。</li>
+<li>print_int()内部需要访问成员变量a, 也就是 this-&gt;a，因此段错误。</li>
+</ul>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cplusplus/">cplusplus</a></li></ul>
+
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/11/24/用Python制作标签云/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          用Python制作标签云
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/10/30/STL源码分析-list的sort函数/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">STL源码分析---list的sort函数&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+  </div>
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>
