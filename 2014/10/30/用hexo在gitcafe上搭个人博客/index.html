@@ -11,7 +11,7 @@
 <meta property="og:url" content="http://ljshou.gitcafe.io/2014/10/30/用hexo在gitcafe上搭个人博客/index.html">
 <meta property="og:site_name" content="L.J.SHOU's Technical Blog">
 <meta property="og:description" content="This blog tells you how to set up your own blog rapidly using Hexo on github/gitcafe pages.">
-<meta property="og:updated_time" content="2015-09-07T13:14:12.023Z">
+<meta property="og:updated_time" content="2015-09-07T13:19:57.284Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Set up personal blog using hexo on github/gitcafe">
 <meta name="twitter:description" content="This blog tells you how to set up your own blog rapidly using Hexo on github/gitcafe pages.">
@@ -88,25 +88,30 @@
 <li><a href="https://nodejs.org/en/" target="_blank" rel="external">https://nodejs.org/en/</a></li>
 </ul>
 </li>
-<li><p>install git</p>
-<ul>
-<li><p>Ubuntu: <figure class="highlight"><figcaption><span>apt-get install git ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#9;- Windows: https://git-for-windows.github.io/&#10;3. install Hexo:&#10;&#9;- Ubuntu: ``` sudo npm install -g hexo-cli</span><br></pre></td></tr></table></figure></p>
+<li>install git<ul>
+<li>Ubuntu: <code>sudo apt-get install git</code></li>
+<li>Windows: <a href="https://git-for-windows.github.io/" target="_blank" rel="external">https://git-for-windows.github.io/</a></li>
+</ul>
 </li>
-<li><p>Windows: <figure class="highlight"><figcaption><span>install -g hexo-cli```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#10;Hexo official site: [Hexo](http://hexo.io)&#10;&#10;### Set up blog locally&#10;```sh&#10;hexo init my_blog #initialize blog&#10;cd my_blog&#10;npm install #set up blog&#10;npm install hexo-server --save #support blog preview&#10;npm install hexo-deployer-git --save #support deploy using git&#10;hexo server #preview blog locally. localhost:4000</span><br></pre></td></tr></table></figure></p>
-</li>
+<li>install Hexo:<ul>
+<li>Ubuntu: <code>sudo npm install -g hexo-cli</code></li>
+<li>Windows: <code>npm install -g hexo-cli</code></li>
 </ul>
 </li>
 </ol>
+<p>Hexo official site: <a href="http://hexo.io" target="_blank" rel="external">Hexo</a></p>
+<h3 id="Set_up_blog_locally">Set up blog locally</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">hexo init my_blog <span class="comment">#initialize blog</span></span><br><span class="line"><span class="built_in">cd</span> my_blog</span><br><span class="line">npm install <span class="comment">#set up blog</span></span><br><span class="line">npm install hexo-server --save <span class="comment">#support blog preview</span></span><br><span class="line">npm install hexo-deployer-git --save <span class="comment">#support deploy using git</span></span><br><span class="line">hexo server <span class="comment">#preview blog locally. localhost:4000</span></span><br></pre></td></tr></table></figure>
 <h3 id="Hexo_commands">Hexo commands</h3><ul>
-<li><p>Initialize hexo blog: <figure class="highlight"><figcaption><span>init```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ Write a new blog: ```hexo new &#34;blog&#39;s title&#34;</span><br></pre></td></tr></table></figure></p>
-</li>
-<li><p>Generate static files: <figure class="highlight"><figcaption><span>generate```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+ Blog preview:```hexo server```. preview blog at ```localhost:4000```.&#10;+ Blog deploy: ```hexo depoly</span><br></pre></td></tr></table></figure></p>
-</li>
+<li>Initialize hexo blog: <code>hexo init</code></li>
+<li>Write a new blog: <code>hexo new &quot;blog&#39;s title&quot;</code></li>
+<li>Generate static files:     <code>hexo generate</code></li>
+<li>Blog preview: <code>hexo server</code>. preview blog at <code>localhost:4000</code></li>
+<li>Blog deploy: <code>hexo depoly</code></li>
 </ul>
 <h3 id="Hexo_deploy">Hexo deploy</h3><p>gitcafe 和 github 很相似，可用于代码托管，同样具有 git-pages的功能，能够托管静态网页。</p>
 <ul>
 <li><p>注册gitcafe账号。在gitcafe注册并创建<strong>公开项目</strong>，<strong>项目名和用户名要一致</strong>。<br>在blog_config.yml添加如下代码：注意把 your_name 替换成你的项目名</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repository: git@gitcafe.com:your_name/your_name.git</span><br><span class="line">  branch: gitcafe-pages</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repository: git@gitcafe.com:your_name/your_name.git</span><br><span class="line">  branch: gitcafe-pages</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>设置 ssh <a href="https://help.github.com/articles/generating-ssh-keys/" target="_blank" rel="external">参考</a><br>将公钥拷贝到你的gitcafe主页上，帐号设置，SSH公钥管理即可。</p>
 </li>
