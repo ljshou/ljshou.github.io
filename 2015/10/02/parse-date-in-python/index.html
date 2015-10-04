@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>parse date in python - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="This post introduce a powerful date-time parse module called dateutil, which is powerful extensions to the standard datetime module.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="parse date in python">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2015/10/02/parse-date-in-python/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="This post introduce a powerful date-time parse module called dateutil, which is powerful extensions to the standard datetime module.">
+<meta property="og:updated_time" content="2015-10-02T16:16:55.838Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="parse date in python">
+<meta name="twitter:description" content="This post introduce a powerful date-time parse module called dateutil, which is powerful extensions to the standard datetime module.">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-parse-date-in-python" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      parse date in python
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/10/02/parse-date-in-python/" class="article-date">
+  <time datetime="2015-10-02T13:00:54.000Z" itemprop="datePublished">Oct 2 2015</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/python/">python</a>
+  </div>
+
+      
+
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>This post introduce a powerful date-time parse module called <strong>dateutil</strong>, which is powerful extensions to the standard datetime module.<br><a id="more"></a></p>
+<h3 id="Brief">Brief</h3><p>Parsing Time is a commonly task in our daily work, such as mining Logs.<br>As variously date formats exist, say “2015/08/10” or “08-10-2015”, a date parse module would be quite usefull.<br>The <strong>dateutil</strong> module provides powerful extensions to the standard datetime module, available in Python 2.3+.</p>
+<h3 id="Installation">Installation</h3><p><strong>dateutil</strong> is not a standard module in Python. So you need to install it first.<br><a href="https://labix.org/python-dateutil#head-2f49784d6b27bae60cde1cff6a535663cf87497b" target="_blank" rel="external">Installation</a></p>
+<h3 id="Example">Example</h3><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> dateutil.parser <span class="keyword">import</span> parse</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> parse(<span class="string">"2015-08-10"</span>)</span><br><span class="line"><span class="keyword">print</span> parse(<span class="string">"08-11-2015"</span>)</span><br><span class="line"><span class="keyword">print</span> parse(<span class="string">"08-11-2015 13:53:00"</span>)</span><br><span class="line"><span class="keyword">print</span> parse(<span class="string">"2015-08-10  13:53:00"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># time difference in seconds</span></span><br><span class="line"><span class="keyword">print</span> int( (parse(<span class="string">"2015-08-10"</span>)-parse(<span class="string">"08-11-2015"</span>)).total_seconds() )</span><br><span class="line"><span class="comment"># time difference in mininutes</span></span><br><span class="line"><span class="keyword">print</span> int( (parse(<span class="string">"2015-08-10"</span>) - parse(<span class="string">"08-11-2015"</span>)).total_seconds() / <span class="number">60</span> )</span><br></pre></td></tr></table></figure>
+<h3 id="Reference">Reference</h3><p><a href="https://labix.org/python-dateutil#head-42a94eedcff96da7fb1f77096b5a3b519c859ba9" target="_blank" rel="external">https://labix.org/python-dateutil#head-42a94eedcff96da7fb1f77096b5a3b519c859ba9</a></p>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/10/03/assert-CSharp/" id="article-nav-newer" class="article-nav-link-wrap">
+      <div class="article-nav-title"><span>&lt;</span>&nbsp;
+        
+          assert in C#
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/09/17/extention-method-in-C/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">extention-method-in-C#&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  
+  <section id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="post-parse-date-in-python" data-title="parse date in python" data-url="http://ljshou.gitcafe.io/2015/10/02/parse-date-in-python/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'shoulinjun'};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+    <!-- 多说公共JS代码 end -->
+  </section>
+  </section>
+
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+
+<div id="clustrmaps-widget" class="outer"></div><script type="text/javascript">var _clustrmaps = {'url' : 'http://www.ljshou.com', 'user' : 1178333, 'server' : '3', 'id' : 'clustrmaps-widget', 'version' : 1, 'date' : '2015-09-09', 'lang' : 'zh', 'corners' : 'square' };(function (){ var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'http://www3.clustrmaps.com/counter/map.js'; var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);})();</script><noscript><a href="http://www3.clustrmaps.com/user/fb111fadd"><img src="http://www3.clustrmaps.com/stats/maps-no_clusters/www.ljshou.com-thumb.jpg" alt="Locations of visitors to this page" /></a></noscript>
+  </div>
+
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>
