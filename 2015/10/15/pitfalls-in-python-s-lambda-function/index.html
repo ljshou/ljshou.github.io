@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>pitfalls in python&#39;s lambda function - L.J.SHOU&#39;s Technical Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="In this post, let’s talk about a pitfall you may easily fall in when using Lambda function in Python.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pitfalls in python's lambda function">
+<meta property="og:url" content="http://ljshou.gitcafe.io/2015/10/15/pitfalls-in-python-s-lambda-function/index.html">
+<meta property="og:site_name" content="L.J.SHOU's Technical Blog">
+<meta property="og:description" content="In this post, let’s talk about a pitfall you may easily fall in when using Lambda function in Python.">
+<meta property="og:updated_time" content="2015-10-15T16:21:33.839Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pitfalls in python's lambda function">
+<meta name="twitter:description" content="In this post, let’s talk about a pitfall you may easily fall in when using Lambda function in Python.">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link href="/webfonts/ptserif/main.css" rel='stylesheet' type='text/css'>
+  <link href="/webfonts/source-code-pro/main.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-inner" class="inner">
+      <a id="main-nav-toggle" class="nav-icon" href="javascript:;"></a>
+      <a id="logo" class="logo" href="/"></a>
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/categories">Categories</a>
+        
+          <a class="main-nav-link" href="/tags">Tags</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        <div id="search-form-wrap">
+          <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://ljshou.gitcafe.io"></form>
+        </div>
+      </nav>
+    </div>
+  </div>
+</header>
+    <section id="main" class="outer"><article id="post-pitfalls-in-python-s-lambda-function" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      pitfalls in python&#39;s lambda function
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-meta">
+      <a href="/2015/10/15/pitfalls-in-python-s-lambda-function/" class="article-date">
+  <time datetime="2015-10-15T15:36:05.000Z" itemprop="datePublished">Oct 15 2015</time>
+</a>
+      
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/python/">python</a>
+  </div>
+
+      
+
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>In this post, let’s talk about a pitfall you may easily fall in when using Lambda function in Python.<br><a id="more"></a></p>
+<h3 id="What_is_lambda_function?">What is lambda function?</h3><p>Python supports an interesting syntax that lets you define one-line mini-functions . Borrowed from Lisp, these so-called lambda functions can be used anywhere a function is required.</p>
+<h3 id="What’s_the_result_of_the_following_code?">What’s the result of the following code?</h3><h4 id="First_code:">First code:</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">L = []</span><br><span class="line">power = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(power)):</span><br><span class="line">	L.append(<span class="keyword">lambda</span> x : x ** power[i])</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> L[<span class="number">0</span>](<span class="number">2</span>), L[<span class="number">1</span>](<span class="number">2</span>), L[<span class="number">2</span>](<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OUTPUT: 16 16 16</span><br></pre></td></tr></table></figure>
+<p>It cannot be serious. I think you should also be astonished with the result like me.<br>It is so weird.</p>
+<p>Here’s another code:</p>
+<h4 id="Second_code:">Second code:</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">L = []</span><br><span class="line">power = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line">L.append(<span class="keyword">lambda</span> x : x ** <span class="number">2</span>)</span><br><span class="line">L.append(<span class="keyword">lambda</span> x : x ** <span class="number">3</span>)</span><br><span class="line">L.append(<span class="keyword">lambda</span> x : x ** <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> L[<span class="number">0</span>](<span class="number">2</span>), L[<span class="number">1</span>](<span class="number">2</span>), L[<span class="number">2</span>](<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OUTPUT: 4 8 16</span><br></pre></td></tr></table></figure>
+<p>Works fine. Even more peculiar! Why the pevious one failes?<br>Only difference is that second remove the for loop.</p>
+<p>Let me show you another code:</p>
+<h4 id="Third_code:">Third code:</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">L = []</span><br><span class="line">power = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(power)):</span><br><span class="line">	L.append(<span class="keyword">lambda</span> x : x ** power[i])</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(L)):</span><br><span class="line">	<span class="keyword">print</span> L[i](<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OUTPUT: 4 8 16</span><br></pre></td></tr></table></figure>
+<p>It works??? Compared with First Code, third code only changes how to print output.<br>Any ideas?</p>
+<h3 id="Root_of_pitfall">Root of pitfall</h3><p>The expected output should be <strong>4 8 16</strong>. but in First code, all three lambda function out 16,<br>which means that power[i] equals to 4. As a result, variable <em>i</em> should equal to 2, right?<br>All three lambda functions bind to variable <em>i</em>, which is outside the lambda function scope.</p>
+<ul>
+<li>First code: <ul>
+<li>after the for loop, <em>i</em> equals to 2, leading to <strong>16 16 16</strong>.</li>
+</ul>
+</li>
+<li>Second code: <ul>
+<li>all three lambda functions do not bind varibls outside their function scope.</li>
+</ul>
+</li>
+<li>Third code: <ul>
+<li>In terms of binding varible outside the scope, lambda function tends to find binding variable inside out. That’s why lambda functions bind variable i to i of for loop.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Solutions">Solutions</h3><p>A little more verbose but less hacky would be to create a new scope each time you create the lambda</p>
+<h4 id="Solution1">Solution1</h4><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">L = []</span><br><span class="line">power = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Power</span><span class="params">(i)</span>:</span></span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">lambda</span> x : x ** power[i]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(power)):</span><br><span class="line">	L.append(Power(i))</span><br></pre></td></tr></table></figure>
+<h4 id="Solution2">Solution2</h4><p>you may force the capture of a variable using an argument with a default value.<br>This is also the solution endorsed by the official FAQ.<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">L = []</span><br><span class="line">power = [<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(power)):</span><br><span class="line">	L.append(<span class="keyword">lambda</span> x, i=i : x ** power[i])</span><br></pre></td></tr></table></figure></p>
+<h3 id="Reference">Reference</h3><p><a href="http://stackoverflow.com/questions/2295290/what-do-lambda-function-closures-capture-in-python" target="_blank" rel="external">Stackoverflow</a></p>
+
+      
+    </div>
+  
+    <footer class="article-footer">
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/10/03/assert-CSharp/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">assert in C#&nbsp;<span>&gt;</span></div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+  
+  <section id="comments">
+    <!-- 多说评论框 start -->
+    <div class="ds-thread" data-thread-key="post-pitfalls-in-python-s-lambda-function" data-title="pitfalls in python&#39;s lambda function" data-url="http://ljshou.gitcafe.io/2015/10/15/pitfalls-in-python-s-lambda-function/"></div>
+    <!-- 多说评论框 end -->
+    <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+    <script type="text/javascript">
+    var duoshuoQuery = {short_name:'shoulinjun'};
+      (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+      })();
+      </script>
+    <!-- 多说公共JS代码 end -->
+  </section>
+  </section>
+
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2015 L.J.SHOU&nbsp;
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>, theme by <a href="http://github.com/ppoffice">PPOffice</a>
+    </div>
+
+<div id="clustrmaps-widget" class="outer"></div><script type="text/javascript">var _clustrmaps = {'url' : 'http://www.ljshou.com', 'user' : 1178333, 'server' : '3', 'id' : 'clustrmaps-widget', 'version' : 1, 'date' : '2015-09-09', 'lang' : 'zh', 'corners' : 'square' };(function (){ var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = 'http://www3.clustrmaps.com/counter/map.js'; var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);})();</script><noscript><a href="http://www3.clustrmaps.com/user/fb111fadd"><img src="http://www3.clustrmaps.com/stats/maps-no_clusters/www.ljshou.com-thumb.jpg" alt="Locations of visitors to this page" /></a></noscript>
+  </div>
+
+</footer>
+    
+
+<script src="/js/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+
+
+<script src="/js/script.js" type="text/javascript"></script>
+  </div>
+</body>
+</html>
